@@ -6,6 +6,23 @@ module.exports = function (app) {
   
   let solver = new SudokuSolver();
 
+  function coordinateToIndex(coordinate) {
+    // Extract the row letter and column number from the coordinate
+    const rowLetter = coordinate[0].toUpperCase();
+    const colNumber = parseInt(coordinate[1], 10);
+  
+    // Convert the row letter to a zero-based row index
+    const rowIndex = rowLetter.charCodeAt(0) - 'A'.charCodeAt(0);
+  
+    // Convert the column number to a zero-based column index
+    const colIndex = colNumber - 1;
+  
+    // Calculate the final index
+    const index = rowIndex * 9 + colIndex;
+  
+    return index;
+  }
+
   app.route('/api/check')
     .post((req, res) => {
       const { puzzle, coordinate, value } = req.body;
@@ -40,15 +57,15 @@ module.exports = function (app) {
       const checkRow = solver.checkRowPlacement(puzzle, row, column, value);
       const checkCol = solver.checkColPlacement(puzzle, row, column, value);
       const checkRegion = solver.checkRegionPlacement(puzzle, row, column, value);
-
+      
       // Determine if placement is valid
-      if (checkRow.valid && checkCol.valid && checkRegion.valid) {
+      if ((checkRow.valid && checkCol.valid && checkRegion.valid) || puzzle[coordinateToIndex(coordinate)] === value) {
         return res.json({ valid: true });
       } else {
         const conflict = [];
-        if (!checkRow.valid) conflict.push('row');
-        if (!checkCol.valid) conflict.push('column');
-        if (!checkRegion.valid) conflict.push('region');
+        if (!checkRow.valid) conflict.push(checkRow.conflict);
+        if (!checkCol.valid) conflict.push(checkCol.conflict);
+        if (!checkRegion.valid) conflict.push(checkRegion.conflict);
         return res.json({ valid: false, conflict });
       }
     });

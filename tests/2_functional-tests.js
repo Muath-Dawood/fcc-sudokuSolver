@@ -72,8 +72,9 @@ suite('Functional Tests', () => {
   test('Check a puzzle placement with all fields', (done) => {
     chai.request(server)
       .post('/api/check')
-      .send({ puzzle: '53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79', coordinate: 'A1', value: '5' })
+      .send({ puzzle: '53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79', coordinate: 'A3', value: '2' })
       .end((err, res) => {
+        console.log(res.body)
         assert.equal(res.status, 200);
         assert.property(res.body, 'valid');
         assert.isTrue(res.body.valid);
@@ -84,7 +85,7 @@ suite('Functional Tests', () => {
   test('Check a puzzle placement with single placement conflict', (done) => {
     chai.request(server)
       .post('/api/check')
-      .send({ puzzle: '53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79', coordinate: 'A1', value: '1' })
+      .send({ puzzle: '53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79', coordinate: 'A4', value: '3' })
       .end((err, res) => {
         assert.equal(res.status, 200);
         assert.property(res.body, 'valid');
@@ -102,7 +103,7 @@ suite('Functional Tests', () => {
         assert.equal(res.status, 200);
         assert.property(res.body, 'valid');
         assert.isFalse(res.body.valid);
-        assert.deepEqual(res.body.conflict, ['row', 'region']);
+        assert.deepEqual(res.body.conflict, ['row', 'column']);
         done();
       });
   });
@@ -110,7 +111,7 @@ suite('Functional Tests', () => {
   test('Check a puzzle placement with all placement conflicts', (done) => {
     chai.request(server)
       .post('/api/check')
-      .send({ puzzle: '53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79', coordinate: 'A1', value: '3' })
+      .send({ puzzle: '53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79', coordinate: 'A6', value: '5' })
       .end((err, res) => {
         assert.equal(res.status, 200);
         assert.property(res.body, 'valid');
